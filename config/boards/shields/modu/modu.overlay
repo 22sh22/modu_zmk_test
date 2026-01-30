@@ -1,5 +1,4 @@
 /* config/boards/shields/modu/modu.overlay */
-
 / {
     chosen {
         zmk,kscan = &kscan0;
@@ -10,7 +9,6 @@
         label = "KSCAN";
         diode-direction = "col2row";
         
-        /* 5행 (Rows) */
         row-gpios
             = <&pro_micro 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
             , <&pro_micro 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
@@ -19,7 +17,6 @@
             , <&pro_micro 21 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
             ;
 
-        /* 6열 (Cols) */
         col-gpios
             = <&pro_micro 4 GPIO_ACTIVE_HIGH>
             , <&pro_micro 5 GPIO_ACTIVE_HIGH>

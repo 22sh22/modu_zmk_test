@@ -47,7 +47,7 @@ jobs:
 
       - name: Modu DTS File
         if: ${{ always() }}
-        run: cat -n build/zephyr/nice_nano.dts.pre.tmp
+        run: cat -n build/zephyr/zephyr.dts
 
       - name: Rename ZMK.uf2
         run: cp build/zephyr/zmk.uf2 modu_firmware.uf2
