@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - board: nrfmicro/nrf52840
+          - board: nice_nano
             shield: modu
     steps:
       - name: Checkout
@@ -47,7 +47,7 @@ jobs:
 
       - name: Modu DTS File
         if: ${{ always() }}
-        run: cat -n build/zephyr/nrfmicro/nrf52840.dts.pre.tmp
+        run: cat -n build/zephyr/nice_nano.dts.pre.tmp
 
       - name: Rename ZMK.uf2
         run: cp build/zephyr/zmk.uf2 modu_firmware.uf2
