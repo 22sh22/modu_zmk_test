@@ -34,6 +34,25 @@
             , <&pro_micro 9 GPIO_ACTIVE_HIGH>
             ;
     };
+    kscan_direct: kscan_1 {
+        compatible = "zmk,kscan-gpio-direct";
+        label = "KSCAN_DIRECT";
+        
+        input-gpios
+            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* 썸 1번 (A0) */
+            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* 썸 2번 (A1) */
+            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> /* 썸 3번 (A2) */
+            ;
+    };
+    kscan_composite: kscan_composite {
+        compatible = "zmk,kscan-composite";
+        label = "KSCAN_COMPOSITE";
+        
+        rows = <5>; 
+        cols = <9>; /* 메인 6개 + 썸 3개 */
+
+        include-kscan = <&kscan_matrix &kscan_direct>;
+    };
 };
 
 /* 트랙볼(PMW3610) 설정 유지 */
