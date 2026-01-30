@@ -3,7 +3,6 @@
 / {
     chosen {
         zmk,kscan = &kscan0;
-        zmk,input-listener = &trackball; 
     };
 
     kscan0: kscan_0 {
@@ -29,13 +28,5 @@
             , <&pro_micro 8 GPIO_ACTIVE_HIGH>
             , <&pro_micro 9 GPIO_ACTIVE_HIGH>
             ;
-    };
-
-    trackball: trackball {
-        compatible = "zmk,input-listener";
-        device = <&nice_view_spi>; 
-        /* 일단 트랙볼도 에러 날 수 있으니 더미로 두거나, 
-           트랙볼 코드가 확실치 않으면 이 블럭을 아예 지우는 게 안전합니다. 
-           (지금은 에러 잡는 게 우선이니 놔둬보죠) */
     };
 };
