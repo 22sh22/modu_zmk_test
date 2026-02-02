@@ -1,9 +1,19 @@
 /* config/boards/shields/modu/modu.overlay */
 / {
     chosen {
-
+        zmk,kscan = &kscan_mock;
     };
-
+    kscan_mock: kscan_mock {
+        compatible = "zmk,kscan-mock";
+        label = "KSCAN_MOCK";
+        
+        /* 기존 매트릭스 크기와 똑같이 맞춰줍니다 */
+        rows = <5>;
+        columns = <6>;
+        
+        /* 이벤트 없음 (아무것도 누르지 않음) */
+        events = <0>;
+    };
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-matrix";
         label = "KSCAN";
