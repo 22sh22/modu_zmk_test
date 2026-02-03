@@ -1,39 +1,83 @@
 /* config/boards/shields/modu/modu.overlay */
+
+#include <dt-bindings/zmk/matrix_transform.h>
+
 / {
     chosen {
-        zmk,kscan = &kscan_mock;
+        zmk,kscan = &kscan0;
     };
-    kscan_mock: kscan_mock {
-        compatible = "zmk,kscan-mock";
-        label = "KSCAN_MOCK";
-        
-        /* 기존 매트릭스 크기와 똑같이 맞춰줍니다 */
-        rows = <5>;
-        columns = <6>;
-        
-        /* 이벤트 없음 (아무것도 누르지 않음) */
-        events = <0>;
-    };
+
+    /* 1. 키보드 매트릭스 설정 (사용자 지정 핀 적용) */
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-matrix";
         label = "KSCAN";
-        diode-direction = "row2col";
-        
+        diode-direction = "col2row"; /* 다이오드 방향이 반대라면 row2col로 변경 */
+
+        /* Row 핀: P1.00, P0.11, P1.04, P1.06 */
         row-gpios
-            = <&pro_micro 21 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&pro_micro 20 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&pro_micro 19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&pro_micro 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&pro_micro 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            = <&gpio1 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio1 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio1 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
             ;
 
+        /* Col 핀: P0.22, P0.24 */
         col-gpios
-            = <&pro_micro 1 GPIO_ACTIVE_HIGH>
-            , <&pro_micro 0 GPIO_ACTIVE_HIGH>
-            , <&pro_micro 2 GPIO_ACTIVE_HIGH>
-            , <&pro_micro 3 GPIO_ACTIVE_HIGH>
-            , <&pro_micro 4 GPIO_ACTIVE_HIGH>
-            , <&pro_micro 5 GPIO_ACTIVE_HIGH>
+            = <&gpio0 22 GPIO_ACTIVE_HIGH>
+            , <&gpio0 24 GPIO_ACTIVE_HIGH>
             ;
+    };
+
+    /* 트랙볼 리스너 등록 */
+    trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+    };
+};
+
+/* 2. 트랙볼 SPI 핀 설정 (하드웨어 핀 지정) */
+&pinctrl {
+    spi0_default: spi0_default {
+        group1 {
+            /* SCLK: P0.08 */
+            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,
+            /* SDIO: P0.20 (MOSI/MISO 공통) */
+                    <NRF_PSEL(SPIM_MOSI, 0, 20)>,
+                    <NRF_PSEL(SPIM_MISO, 0, 20)>;
+        };
+    };
+
+    spi0_sleep: spi0_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,
+                    <NRF_PSEL(SPIM_MOSI, 0, 20)>,
+                    <NRF_PSEL(SPIM_MISO, 0, 20)>;
+            low-power-enable;
+        };
+    };
+};
+
+/* 3. SPI 통신 및 센서 설정 */
+&spi0 {
+    status = "okay";
+    compatible = "nordic,nrf-spim";
+    pinctrl-0 = <&spi0_default>;
+    pinctrl-1 = <&spi0_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    /* CS 핀: P0.06 */
+    cs-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+
+    trackball: trackball@0 {
+        status = "okay";
+        compatible = "pixart,pmw3610";
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+
+        /* MOT 핀: P0.31 */
+        irq-gpios = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        /* (선택) 트랙볼 방향 반전이나 스크롤 레이어 설정 */
+        /* scroll-layers = <1>; */
     };
 };
