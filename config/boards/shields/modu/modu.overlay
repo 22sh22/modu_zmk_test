@@ -75,7 +75,7 @@
         spi-max-frequency = <2000000>;
 
         /* MOT 핀: P0.31 */
-        irq-gpios = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        motion-gpios = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 
         /* (선택) 트랙볼 방향 반전이나 스크롤 레이어 설정 */
         /* scroll-layers = <1>; */
