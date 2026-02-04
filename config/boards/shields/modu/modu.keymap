@@ -14,7 +14,7 @@
                 &kp A         &kp B          /* 첫 번째 줄: A, B */
                 &kp C         &kp D          /* 두 번째 줄: C, D */
                 &kp E         &kp F          /* 세 번째 줄: E, F */
-                &mkp LCLK     &mkp RCLK      /* 네 번째 줄: 좌클릭, 우클릭 */
+                &kp G         &kp H      /* 네 번째 줄: 좌클릭, 우클릭 */
             >;
         };
     };
