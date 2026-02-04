@@ -6,25 +6,35 @@
 / {
     chosen {
         zmk,kscan = &kscan0;
-        zmk,input = &trackball;
+        /* zmk,input = &trackball;  <-- 이 줄 대신 아래 listener를 씁니다 */
     };
 
-    /* 키보드 매트릭스 설정 (기존과 동일) */
+    /* [추가] 트랙볼 입력을 시스템 마우스로 연결해주는 리스너 */
+    trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+        
+        /* (선택) 움직임이 너무 빠르면 아래 값을 늘리세요 (기본 1) */
+        /* xy-swap; */ /* (선택) X, Y축을 서로 바꾸려면 주석 해제 */
+        /* y-invert; */ /* (선택) Y축 위아래 반전하려면 주석 해제 */
+        /* x-invert; */ /* (선택) X축 좌우 반전하려면 주석 해제 */
+    };
+
     kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-matrix";
         label = "KSCAN";
         diode-direction = "row2col";
 
         row-gpios
-            = <&gpio1 0 GPIO_ACTIVE_HIGH>
-            , <&gpio0 11 GPIO_ACTIVE_HIGH>
-            , <&gpio1 4 GPIO_ACTIVE_HIGH>
-            , <&gpio1 6 GPIO_ACTIVE_HIGH>
+            = <&gpio1 0 GPIO_ACTIVE_HIGH>   /* D6 */
+            , <&gpio0 11 GPIO_ACTIVE_HIGH>  /* D7 */
+            , <&gpio1 4 GPIO_ACTIVE_HIGH>   /* D8 */
+            , <&gpio1 6 GPIO_ACTIVE_HIGH>   /* D9 */
             ;
 
         col-gpios
-            = <&gpio0 22 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&gpio0 24 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            = <&gpio0 22 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* D4 */
+            , <&gpio0 24 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* D5 */
             ;
     };
 };
@@ -32,9 +42,9 @@
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
-            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,
-                    <NRF_PSEL(SPIM_MOSI, 0, 20)>,
-                    <NRF_PSEL(SPIM_MISO, 0, 20)>;
+            psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,   /* SCLK: D1 */
+                    <NRF_PSEL(SPIM_MOSI, 0, 20)>,  /* SDIO: D3 */
+                    <NRF_PSEL(SPIM_MISO, 0, 20)>;  /* SDIO: D3 */
         };
     };
 
@@ -54,21 +64,21 @@
     pinctrl-0 = <&spi0_default>;
     pinctrl-1 = <&spi0_sleep>;
     pinctrl-names = "default", "sleep";
+    
+    /* CS: D0 (TX) */
     cs-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
 
     trackball: trackball@0 {
         status = "okay";
-        /* [중요] badjeff 드라이버는 이름 뒤에 -alt가 붙습니다! */
-        compatible = "pixart,pmw3610-alt";
+        compatible = "pixart,pmw3610"; /* -alt가 안 먹히면 그냥 pmw3610 시도 */
         reg = <0>;
         spi-max-frequency = <2000000>;
         
-        /* MOT 핀 */
-        motion-gpios = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        /* [수정] motion-gpios -> irq-gpios (표준 이름) */
+        /* MOT: D17 (P0.31) */
+        irq-gpios = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 
-        /* [설정] badjeff 드라이버 전용 옵션 (필요시 수정) */
-        cpi = <600>;      /* 감도 설정 (기본값: 1200) */
-        /* invert-x; */   /* X축 반전 필요하면 주석 해제 */
-        /* invert-y; */   /* Y축 반전 필요하면 주석 해제 */
+        /* DPI 설정 (드라이버 버전에 따라 scroll-layers 등 옵션 다름) */
+        /* cpi = <600>; */
     };
 };
