@@ -57,6 +57,7 @@
         };
     };
 };
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 &spi0 {
     status = "okay";
@@ -70,7 +71,7 @@
 
     trackball: trackball@0 {
         status = "okay";
-        compatible = "pixart,pmw3610"; /* -alt가 안 먹히면 그냥 pmw3610 시도 */
+        compatible = "pixart,pmw3610-alt"; /* -alt가 안 먹히면 그냥 pmw3610 시도 */
         reg = <0>;
         spi-max-frequency = <2000000>;
         
@@ -80,5 +81,19 @@
 
         /* DPI 설정 (드라이버 버전에 따라 scroll-layers 등 옵션 다름) */
         /* cpi = <600>; */
+
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
+        force-awake;
+
+        force-awake-4ms-mode;
     };
+};
+
+/ {
+  trackball_listener {
+    compatible = "zmk,input-listener";
+    device = <&trackball>;
+  };
 };
